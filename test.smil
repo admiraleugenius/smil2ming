@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE smil PUBLIC "-//W3C//DTD SMIL 1.0//EN" "http://www.w3.org/TR/REC-smil/SMIL10.dtd">
-<smil>
+<!DOCTYPE smil SYSTEM "file:/Users/matthiasmenn/Documents/smil/DTD/SMIL30Language.dtd">
+<smil version="3.0" baseProfile="Language" xmlns="">
     <head>
         <layout>
             <root-layout background-color="fafafa" width="600" height="400"/>
         </layout>
     </head>
     <body>
-        <img src="picture.jpg"/>
-        <img src="test.dbl"/>
+        <img src="picture.jpg" begin="1s"/>
+        <img src="test.dbl" begin="6s"/>
     </body>
 </smil>

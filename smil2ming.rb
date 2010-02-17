@@ -46,6 +46,16 @@ end
 @m.set_background(@bgR, @bgG, @bgB)
 
 
+@images=Array.new
+root.elements[2].elements.each("//img") do |img|
+	@images.push(SWFBitmap.new(img.attributes["src"]))
+end	
+	
+@images.each {|i| @m.add(i)}
+	
+
+
+
 
 @m.save("smil2mingTest.swf")
 
