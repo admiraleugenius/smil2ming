@@ -7,7 +7,7 @@
         </layout>
     </head>
     <body>
-        <img src="picture.jpg" begin="1s"/>
-        <img src="test.dbl" begin="6s"/>
+        <img src="picture.jpg" begin="1s" dur="4s"/>
+        <img src="test.dbl" begin="6s" dur="4s"/>
     </body>
 </smil>

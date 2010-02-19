@@ -28,7 +28,7 @@ end
 # init Movie
 
 @m = SWFMovie.new
-@m.set_rate(24.0)
+@m.set_rate(20.0)
 
 
 # root-layout
@@ -48,13 +48,24 @@ end
 
 @images=Array.new
 root.elements[2].elements.each("//img") do |img|
-	@images.push(SWFBitmap.new(img.attributes["src"]))
-end	
 	
-@images.each {|i| @m.add(i)}
+	@imageClip = SWFMovieClip.new
+	(0...(((img.attributes["begin"].to_i)-1)*20)).each {@imageClip.next_frame}
 	
+	@i=@imageClip.add(SWFBitmap.new(img.attributes["src"]))
+	
+	(((img.attributes["begin"].to_i)*20+1)...(((img.attributes["begin"].to_i)*20)+(img.attributes["dur"].to_i)*20)). each {@imageClip.next_frame}
+	
+	@i.remove()
+	@imageClip.add(SWFAction.new('this.stop();'))
+	@imageClip.next_frame
+	@images.push(@imageClip)
+end
 
-
+@images.each do |s|
+	@m.add(s)
+	@m.next_frame
+end
 
 
 @m.save("smil2mingTest.swf")
