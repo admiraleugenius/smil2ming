@@ -45,28 +45,63 @@ end
 @bgB =  @bgC.slice!(0..1).hex
 @m.set_background(@bgR, @bgG, @bgB)
 
+# synchronization
 
-@images=Array.new
-root.elements[2].elements.each("//img") do |img|
-	
-	@imageClip = SWFMovieClip.new
-	(0...(((img.attributes["begin"].to_i)-1)*20)).each {@imageClip.next_frame}
-	
-	@i=@imageClip.add(SWFBitmap.new(img.attributes["src"]))
-	
-	(((img.attributes["begin"].to_i)*20+1)...(((img.attributes["begin"].to_i)*20)+(img.attributes["dur"].to_i)*20)). each {@imageClip.next_frame}
-	
-	@i.remove()
-	@imageClip.add(SWFAction.new('this.stop();'))
-	@imageClip.next_frame
-	@images.push(@imageClip)
+#parallel
+root.elements[2].elements.each("//par") do |par|
+	puts "kuku"
+	if par.elements["par"].nil? & par.elements["seq"].nil? then
+		@media= addMediaOfElement(par)
+		@media.each do |s|
+		@m.add(s)
+		end
+
+	else
+		puts "medien müssen synchronisiert werden"
+	end
 end
 
-@images.each do |s|
-	@m.add(s)
-	@m.next_frame
+#sequential
+
+root.elements[2].elements.each("*/seq/") do
 end
 
+
+
+def addMediaOfElement(element)
+
+	@movieClips=Array.new	
+	element.elements.each do |e|	
+		@movieClip = SWFMovieClip.new
+		@beginOffset = (element.attributes["begin"].to_i)*20
+		@duration = (element.attributes["dur"].to_i)*20
+		(0...(@beginOffset)).each {@movieClip.next_frame}
+	
+		@i=@movieClip.add(SWFBitmap.new(element.attributes["src"]))
+	
+		if element.attributes["left"].nil? then
+			@left=0
+		else
+			@left=element.attributes["left"].to_f
+		end
+	
+		if element.attributes["top"].nil? then
+			@top=0
+		else
+			@top=element.attributes["top"].to_f
+		end
+	
+		@i.move_to(@left,@top)
+		
+		((@beginOffset+1)...(@beginOffset+@duration)).each {@movieClip.next_frame}
+	
+		@i.remove()
+		@movieClip.add(SWFAction.new('this.stop();'))
+		@movieClip.next_frame
+		@movieClips.push(@movieClip)
+		return @movieClips
+	end
+end
 
 @m.save("smil2mingTest.swf")
 
