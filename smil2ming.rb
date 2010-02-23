@@ -19,11 +19,10 @@ doc = Document.new(xmlFile)
 root=doc.root
 
 
-def addMediaOfElement(element)
+def addMediaOfParElement(element)
 
 	@movieClips=Array.new	
 	element.elements.each do |e|
-	puts e	
 		@movieClip = SWFMovieClip.new
 		@beginOffset = (e.attributes["begin"].to_i)*@fRate.to_i
 		@duration = (e.attributes["dur"].to_i)*@fRate.to_i
@@ -55,6 +54,43 @@ def addMediaOfElement(element)
 	return @movieClips
 end
 
+def addMediaOfSeqElement(element)
+
+	@movieClips=Array.new	
+		@t=0
+	element.elements.each do |e|
+		
+		@movieClip = SWFMovieClip.new
+		@beginOffset = ((e.attributes["begin"].to_i)*@fRate.to_i) + @t
+		@duration = (e.attributes["dur"].to_i)*@fRate.to_i
+		(0...(@beginOffset)).each {@movieClip.next_frame}
+	
+		@i=@movieClip.add(SWFBitmap.new(e.attributes["src"]))
+	
+		if e.attributes["left"].nil? then
+			@left=0
+		else
+			@left=e.attributes["left"].to_f
+		end
+	
+		if e.attributes["top"].nil? then
+			@top=0
+		else
+			@top=e.attributes["top"].to_f
+		end
+	
+		@i.move_to(@left,@top)
+		
+		((@beginOffset+1)...(@beginOffset+@duration)).each {@movieClip.next_frame}
+	
+		@i.remove()
+		@t=@t + (@beginOffset+@duration)
+		@movieClip.add(SWFAction.new('this.stop();'))
+		@movieClip.next_frame
+		@movieClips.push(@movieClip)
+	end
+	return @movieClips
+end
 
 
 # testen ob file ein SMIL-Dokument ist
@@ -89,7 +125,7 @@ end
 #parallel
 root.elements[2].elements.each("//par") do |par|
 	if par.elements["par"].nil? & par.elements["seq"].nil? then
-		@media= addMediaOfElement(par)
+		@media= addMediaOfParElement(par)
 		@media.each do |s|
 		@m.add(s)
 		end
@@ -103,11 +139,11 @@ end
 
 root.elements[2].elements.each("//seq") do |seq|
 	if seq.elements["par"].nil? & seq.elements["seq"].nil? then
-		@media= addMediaOfElement(seq)
+		@media= addMediaOfSeqElement(seq)
 		@media.each do |s|
 		
 		@m.add(s)
-		@m.next_frame
+		
 		end
 		
 	else
